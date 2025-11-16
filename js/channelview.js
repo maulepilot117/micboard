@@ -10,6 +10,8 @@ function allSlots() {
   const slot = micboard.config.slots;
   const out = [];
 
+  console.log('allSlots() - demo mode:', micboard.url.demo, 'config.slots:', micboard.config.slots);
+
   if (micboard.url.demo) {
     return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   }
@@ -21,18 +23,24 @@ function allSlots() {
 }
 
 
+// Global flag to track if mobile click handler is attached
+let mobileClickHandlerAttached = false;
+
 // enables info-drawer toggle for mobile clients
 function infoToggle() {
-  document.querySelectorAll('.col-sm').forEach(el => {
-    el.addEventListener('click', (e) => {
-      if (window.innerWidth <= 980 && micboard.settingsMode !== 'EXTENDED') {
-        const infoDrawer = e.currentTarget.querySelector('.info-drawer');
+  // Use event delegation to avoid adding multiple listeners
+  if (!mobileClickHandlerAttached) {
+    document.getElementById('micboard').addEventListener('click', (e) => {
+      const colSm = e.target.closest('.col-sm');
+      if (colSm && window.innerWidth <= 980 && micboard.settingsMode !== 'EXTENDED') {
+        const infoDrawer = colSm.querySelector('.info-drawer');
         if (infoDrawer) {
           infoDrawer.style.display = infoDrawer.style.display === 'none' ? 'block' : 'none';
         }
       }
     });
-  });
+    mobileClickHandlerAttached = true;
+  }
 
   const goGroupEdit = document.getElementById('go-groupedit');
   if (goGroupEdit) {
