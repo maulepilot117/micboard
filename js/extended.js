@@ -84,21 +84,41 @@ function initSlotEdit() {
   const t = document.getElementById('save-template').content.cloneNode(true);
   document.getElementById('micboard').appendChild(t);
 
-  $('#slotSave').on('click', () => {
-    submitUpdate(slotValues());
-  });
+  const slotSave = document.getElementById('slotSave');
+  if (slotSave) {
+    slotSave.addEventListener('click', () => {
+      submitUpdate(slotValues());
+    });
+  }
 
-  $('#bulk-name-loader').on('click', () => {
-    loadBulkNames();
-  });
+  const bulkNameLoader = document.getElementById('bulk-name-loader');
+  if (bulkNameLoader) {
+    bulkNameLoader.addEventListener('click', () => {
+      loadBulkNames();
+    });
+  }
 
-  $('#clear-id').on('click', () => {
-    $('.ext-id:input').val('');
-  });
+  const clearId = document.getElementById('clear-id');
+  if (clearId) {
+    clearId.addEventListener('click', () => {
+      document.querySelectorAll('.ext-id').forEach(el => {
+        if (el.tagName === 'INPUT') {
+          el.value = '';
+        }
+      });
+    });
+  }
 
-  $('#clear-name').on('click', () => {
-    $('.ext-name:input').val('');
-  });
+  const clearName = document.getElementById('clear-name');
+  if (clearName) {
+    clearName.addEventListener('click', () => {
+      document.querySelectorAll('.ext-name').forEach(el => {
+        if (el.tagName === 'INPUT') {
+          el.value = '';
+        }
+      });
+    });
+  }
 }
 
 export function slotEditToggle() {

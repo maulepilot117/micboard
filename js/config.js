@@ -152,14 +152,20 @@ function addAllDiscoveredDevices() {
 }
 
 function updateHiddenSlots() {
-  $('.cfg-type').each(function() {
-    const type = $(this).val();
-    if (type === 'offline' || type === '') {
-      $(this).closest('.cfg-row').find('.cfg-ip').hide()
-      $(this).closest('.cfg-row').find('.cfg-channel').hide();
-    } else {
-      $(this).closest('.cfg-row').find('.cfg-ip').show();
-      $(this).closest('.cfg-row').find('.cfg-channel').show();
+  document.querySelectorAll('.cfg-type').forEach(el => {
+    const type = el.value;
+    const row = el.closest('.cfg-row');
+    if (row) {
+      const cfgIp = row.querySelector('.cfg-ip');
+      const cfgChannel = row.querySelector('.cfg-channel');
+
+      if (type === 'offline' || type === '') {
+        if (cfgIp) cfgIp.style.display = 'none';
+        if (cfgChannel) cfgChannel.style.display = 'none';
+      } else {
+        if (cfgIp) cfgIp.style.display = 'block';
+        if (cfgChannel) cfgChannel.style.display = 'block';
+      }
     }
   });
 }
@@ -172,59 +178,95 @@ export function initConfigEditor() {
 
   micboard.settingsMode = 'CONFIG';
   updateHash();
-  $('#micboard').hide();
-  $('.settings').show();
+
+  const micboardEl = document.getElementById('micboard');
+  if (micboardEl) {
+    micboardEl.style.display = 'none';
+  }
+
+  const settingsEl = document.querySelector('.settings');
+  if (settingsEl) {
+    settingsEl.style.display = 'block';
+  }
 
   renderSlotList();
   renderDiscoverdDeviceList();
 
   dragSetup();
 
-
-
   updateHiddenSlots();
 
-  $(document).on('change', '.cfg-type', function() {
-    updateHiddenSlots();
-  });
-
-  $('#add-discovered').click(function() {
-    addAllDiscoveredDevices();
-  });
-
-  $('#save').click(function() {
-    const data = generateJSONConfig();
-    const url = 'api/config';
-    console.log(data);
-    postJSON(url, data, () => {
-      micboard.settingsMode = 'NONE';
-      updateHash();
-      window.location.reload();
-    });
-  });
-
-  $('#editor_holder').on('click', '.del-btn', function() {
-    $(this).closest('.cfg-row').remove();
-    updateSlotID();
-    renderDiscoverdDeviceList();
-  });
-
-  $('#clear-config').click(function() {
-    $('#editor_holder .cfg-row').remove();
-    let t;
-    for (let i = 0; i < 4; i += 1) {
-      t = document.getElementById('config-slot-template').content.cloneNode(true);
-      document.getElementById('editor_holder').append(t);
+  // Event delegation for .cfg-type change
+  document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('cfg-type')) {
+      updateHiddenSlots();
     }
-    updateSlotID();
-    updateHiddenSlots();
-    renderDiscoverdDeviceList();
   });
 
-  $('#add-config-row').click(function() {
-    const t = document.getElementById('config-slot-template').content.cloneNode(true);
-    document.getElementById('editor_holder').append(t);
-    updateSlotID();
-    updateHiddenSlots();
-  });
+  const addDiscovered = document.getElementById('add-discovered');
+  if (addDiscovered) {
+    addDiscovered.addEventListener('click', () => {
+      addAllDiscoveredDevices();
+    });
+  }
+
+  const saveBtn = document.getElementById('save');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      const data = generateJSONConfig();
+      const url = 'api/config';
+      console.log(data);
+      postJSON(url, data, () => {
+        micboard.settingsMode = 'NONE';
+        updateHash();
+        window.location.reload();
+      });
+    });
+  }
+
+  // Event delegation for .del-btn click
+  const editorHolder = document.getElementById('editor_holder');
+  if (editorHolder) {
+    editorHolder.addEventListener('click', (e) => {
+      if (e.target.classList.contains('del-btn')) {
+        const row = e.target.closest('.cfg-row');
+        if (row) {
+          row.remove();
+          updateSlotID();
+          renderDiscoverdDeviceList();
+        }
+      }
+    });
+  }
+
+  const clearConfig = document.getElementById('clear-config');
+  if (clearConfig) {
+    clearConfig.addEventListener('click', () => {
+      const editorHolder = document.getElementById('editor_holder');
+      if (editorHolder) {
+        editorHolder.querySelectorAll('.cfg-row').forEach(row => row.remove());
+        let t;
+        for (let i = 0; i < 4; i += 1) {
+          t = document.getElementById('config-slot-template').content.cloneNode(true);
+          editorHolder.append(t);
+        }
+        updateSlotID();
+        updateHiddenSlots();
+        renderDiscoverdDeviceList();
+      }
+    });
+  }
+
+  const addConfigRow = document.getElementById('add-config-row');
+  if (addConfigRow) {
+    addConfigRow.addEventListener('click', () => {
+      const t = document.getElementById('config-slot-template').content.cloneNode(true);
+      const editorHolder = document.getElementById('editor_holder');
+      if (editorHolder) {
+        editorHolder.append(t);
+        updateSlotID();
+        updateHiddenSlots();
+      }
+    });
+  }
 }

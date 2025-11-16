@@ -23,16 +23,24 @@ function allSlots() {
 
 // enables info-drawer toggle for mobile clients
 function infoToggle() {
-  $('.col-sm').click((e) => {
-    if ($(window).width() <= 980 && micboard.settingsMode !== 'EXTENDED') {
-      $(e.currentTarget).find('.info-drawer').toggle();
-    }
+  document.querySelectorAll('.col-sm').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (window.innerWidth <= 980 && micboard.settingsMode !== 'EXTENDED') {
+        const infoDrawer = e.currentTarget.querySelector('.info-drawer');
+        if (infoDrawer) {
+          infoDrawer.style.display = infoDrawer.style.display === 'none' ? 'block' : 'none';
+        }
+      }
+    });
   });
 
-  if (micboard.group === 0) {
-    $('#go-groupedit').hide();
-  } else if (micboard.group !== 0) {
-    $('#go-groupedit').show();
+  const goGroupEdit = document.getElementById('go-groupedit');
+  if (goGroupEdit) {
+    if (micboard.group === 0) {
+      goGroupEdit.style.display = 'none';
+    } else if (micboard.group !== 0) {
+      goGroupEdit.style.display = 'block';
+    }
   }
 }
 
@@ -290,8 +298,14 @@ export function renderDisplayList(dl) {
 
 export function renderGroup(group) {
   if (micboard.settingsMode === 'CONFIG') {
-    $('#micboard').show();
-    $('.settings').hide();
+    const micboardEl = document.getElementById('micboard');
+    if (micboardEl) {
+      micboardEl.style.display = 'block';
+    }
+    const settingsEl = document.querySelector('.settings');
+    if (settingsEl) {
+      settingsEl.style.display = 'none';
+    }
   }
   micboard.group = group;
   updateHash();
