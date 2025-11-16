@@ -1,8 +1,11 @@
 "use strict";
 
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import QRCode from 'qrcode';
+
+// Make bootstrap available globally for other modules
+window.bootstrap = bootstrap;
 
 import { autoRandom, seedTransmitters } from './demodata.js';
 import { renderGroup, renderDisplayList, updateSlot } from './channelview.js';
