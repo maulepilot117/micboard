@@ -175,11 +175,18 @@ function getUrlParameter(sParam) {
 
 
 function readURLParameters() {
+  console.log('Reading URL parameters from hash:', window.location.hash);
   micboard.url.group = getUrlParameter('group');
   micboard.url.demo = getUrlParameter('demo');
   micboard.url.settings = getUrlParameter('settings');
   micboard.url.tvmode = getUrlParameter('tvmode');
   micboard.url.bgmode = getUrlParameter('bgmode');
+
+  console.log('Parsed URL params:', {
+    demo: micboard.url.demo,
+    group: micboard.url.group,
+    settings: micboard.url.settings
+  });
 
   if (window.location.pathname.includes('demo')) {
     micboard.url.demo = 'true';
@@ -243,7 +250,7 @@ function initialMap(callback) {
         micboard.config = data.config;
         mapGroups();
 
-        if (micboard.config.slots.length < 1) {
+        if (micboard.config.slots.length < 1 && micboard.url.demo !== 'true') {
           setTimeout(function() {
             initConfigEditor();
           }, 125);
