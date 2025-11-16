@@ -1,9 +1,11 @@
 "use strict";
 
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import QRCode from 'qrcode';
-import 'whatwg-fetch';
+
+// Make bootstrap available globally for other modules
+window.bootstrap = bootstrap;
 
 import { autoRandom, seedTransmitters } from './demodata.js';
 import { renderGroup, renderDisplayList, updateSlot } from './channelview.js';
@@ -45,13 +47,13 @@ export function ActivateMessageBoard(h1, p) {
     p = 'Could not connect to the micboard server. Please <a href=".">refresh</a> the page.';
   }
 
-  $('#micboard').hide();
-  $('.settings').hide();
+  document.getElementById('micboard').style.display = 'none';
+  document.querySelector('.settings').style.display = 'none';
   const eb = document.getElementsByClassName('message-board')[0];
   eb.querySelector('h1').innerHTML = h1;
   eb.querySelector('p').innerHTML = p;
 
-  $('.message-board').show();
+  document.querySelector('.message-board').style.display = 'block';
 
   micboard.connectionStatus = 'DISCONNECTED';
 }
@@ -107,29 +109,45 @@ export function updateNavLinks() {
 }
 
 function mapGroups() {
-  $('a#go-extended').click(() => {
+  document.getElementById('go-extended').addEventListener('click', () => {
     slotEditToggle();
-    $('.collapse').collapse('hide');
-  });
-
-  $('a#go-config').click(() => {
-    initConfigEditor();
-    $('.collapse').collapse('hide');
-  });
-
-  $('a#go-groupedit').click(() => {
-    if (micboard.group !== 0) {
-      groupEditToggle();
-      $('.collapse').collapse('hide');
+    const collapseEl = document.querySelector('.collapse');
+    if (collapseEl) {
+      const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
+      bsCollapse.hide();
     }
   });
 
-  $('a.preset-link').each(function(index) {
-    const id = parseInt($(this).attr('id')[9], 10);
+  document.getElementById('go-config').addEventListener('click', () => {
+    initConfigEditor();
+    const collapseEl = document.querySelector('.collapse');
+    if (collapseEl) {
+      const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
+      bsCollapse.hide();
+    }
+  });
 
-    $(this).click(() => {
+  document.getElementById('go-groupedit').addEventListener('click', () => {
+    if (micboard.group !== 0) {
+      groupEditToggle();
+      const collapseEl = document.querySelector('.collapse');
+      if (collapseEl) {
+        const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
+        bsCollapse.hide();
+      }
+    }
+  });
+
+  document.querySelectorAll('a.preset-link').forEach((el) => {
+    const id = parseInt(el.getAttribute('id')[9], 10);
+
+    el.addEventListener('click', () => {
       renderGroup(id);
-      $('.collapse').collapse('hide');
+      const collapseEl = document.querySelector('.collapse');
+      if (collapseEl) {
+        const bsCollapse = bootstrap.Collapse.getInstance(collapseEl) || new bootstrap.Collapse(collapseEl, { toggle: false });
+        bsCollapse.hide();
+      }
     });
   });
 
@@ -225,7 +243,7 @@ function initialMap(callback) {
         micboard.config = data.config;
         mapGroups();
 
-        if (micboard.config.slots.length < 1) {
+        if (micboard.config.slots.length < 1 && micboard.url.demo !== 'true') {
           setTimeout(function() {
             initConfigEditor();
           }, 125);
@@ -251,13 +269,13 @@ function initialMap(callback) {
 }
 
 
-$(document).ready(() => {
+document.addEventListener('DOMContentLoaded', () => {
   console.log('Starting Micboard version: ' + VERSION);
   readURLParameters();
   keybindings();
   if (micboard.url.demo === 'true') {
     setTimeout(() => {
-      $('#hud').show();
+      document.getElementById('hud').style.display = 'block';
     }, 100);
 
     initialMap();

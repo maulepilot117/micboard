@@ -10,8 +10,10 @@ function swapClass(selector, currentClass, newClass) {
 
 export function setBackground(mode) {
   micboard.backgroundMode = mode;
-  $('#micboard .mic_name').css('background-image', '');
-  $('#micboard .mic_name').css('background-size', '');
+  document.querySelectorAll('#micboard .mic_name').forEach(el => {
+    el.style.backgroundImage = '';
+    el.style.backgroundSize = '';
+  });
   updateGIFBackgrounds();
   updateHash();
 }

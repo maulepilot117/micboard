@@ -21,18 +21,32 @@ function allSlots() {
 }
 
 
+// Global flag to track if mobile click handler is attached
+let mobileClickHandlerAttached = false;
+
 // enables info-drawer toggle for mobile clients
 function infoToggle() {
-  $('.col-sm').click((e) => {
-    if ($(window).width() <= 980 && micboard.settingsMode !== 'EXTENDED') {
-      $(e.currentTarget).find('.info-drawer').toggle();
-    }
-  });
+  // Use event delegation to avoid adding multiple listeners
+  if (!mobileClickHandlerAttached) {
+    document.getElementById('micboard').addEventListener('click', (e) => {
+      const colSm = e.target.closest('.col-sm');
+      if (colSm && window.innerWidth <= 980 && micboard.settingsMode !== 'EXTENDED') {
+        const infoDrawer = colSm.querySelector('.info-drawer');
+        if (infoDrawer) {
+          infoDrawer.style.display = infoDrawer.style.display === 'none' ? 'block' : 'none';
+        }
+      }
+    });
+    mobileClickHandlerAttached = true;
+  }
 
-  if (micboard.group === 0) {
-    $('#go-groupedit').hide();
-  } else if (micboard.group !== 0) {
-    $('#go-groupedit').show();
+  const goGroupEdit = document.getElementById('go-groupedit');
+  if (goGroupEdit) {
+    if (micboard.group === 0) {
+      goGroupEdit.style.display = 'none';
+    } else if (micboard.group !== 0) {
+      goGroupEdit.style.display = 'block';
+    }
   }
 }
 
@@ -272,7 +286,7 @@ export function renderDisplayList(dl) {
   const tx = micboard.transmitters;
   dl.forEach((e) => {
     let t;
-    if (e !== 0) {
+    if (e !== 0 && tx[e]) {
       t = document.getElementById('column-template').content.cloneNode(true);
       t.querySelector('div.col-sm').id = 'slot-' + tx[e].slot;
       updateViewOnly(t, tx[e]);
@@ -290,8 +304,14 @@ export function renderDisplayList(dl) {
 
 export function renderGroup(group) {
   if (micboard.settingsMode === 'CONFIG') {
-    $('#micboard').show();
-    $('.settings').hide();
+    const micboardEl = document.getElementById('micboard');
+    if (micboardEl) {
+      micboardEl.style.display = 'block';
+    }
+    const settingsEl = document.querySelector('.settings');
+    if (settingsEl) {
+      settingsEl.style.display = 'none';
+    }
   }
   micboard.group = group;
   updateHash();

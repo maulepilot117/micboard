@@ -165,14 +165,24 @@ function submitSlotUpdate() {
 }
 
 export function initEditor() {
-  $('#editorClose').on('click', () => {
-    groupEditToggle();
-  });
+  const editorClose = document.getElementById('editorClose');
+  if (editorClose) {
+    editorClose.addEventListener('click', () => {
+      groupEditToggle();
+    });
+  }
 
-  $('#editorSave').on('click', () => {
-    submitSlotUpdate();
-  });
-  $('#editorClear').on('click', () => {
-    clearAll();
-  });
+  const editorSave = document.getElementById('editorSave');
+  if (editorSave) {
+    editorSave.addEventListener('click', () => {
+      submitSlotUpdate();
+    });
+  }
+
+  const editorClear = document.getElementById('editorClear');
+  if (editorClear) {
+    editorClear.addEventListener('click', () => {
+      clearAll();
+    });
+  }
 }
