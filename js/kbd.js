@@ -18,9 +18,12 @@ function toggleFullScreen() {
 }
 
 export function keybindings() {
-  $('#hud-button').click( function() {
-    $('#hud').hide();
-  });
+  const hudButton = document.getElementById('hud-button');
+  if (hudButton) {
+    hudButton.addEventListener('click', function() {
+      document.getElementById('hud').style.display = 'none';
+    });
+  }
 
 
   document.addEventListener('keydown', (e) => {
@@ -29,13 +32,16 @@ export function keybindings() {
       updateHash();
       window.location.reload();
     }
-    if ($('.settings').is(':visible')) {
+    const settingsEl = document.querySelector('.settings');
+    if (settingsEl && settingsEl.offsetParent !== null) {
       return;
     }
-    if ($('.editzone').is(':visible')) {
+    const editzoneEl = document.querySelector('.editzone');
+    if (editzoneEl && editzoneEl.offsetParent !== null) {
       return;
     }
-    if ($('.sidebar-nav').is(':visible')) {
+    const sidebarEl = document.querySelector('.sidebar-nav');
+    if (sidebarEl && sidebarEl.offsetParent !== null) {
       return;
     }
 
@@ -100,7 +106,10 @@ export function keybindings() {
 
     if (e.key === 'N') {
       slotEditToggle();
-      $('#paste-box').show();
+      const pasteBox = document.getElementById('paste-box');
+      if (pasteBox) {
+        pasteBox.style.display = 'block';
+      }
     }
 
     if (e.key === 's') {
@@ -109,7 +118,11 @@ export function keybindings() {
 
     if (e.key === 'q') {
       generateQR();
-      $('.modal').modal('toggle');
+      const modalEl = document.querySelector('.modal');
+      if (modalEl) {
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.toggle();
+      }
     }
 
     if (e.key === 't') {
@@ -121,7 +134,10 @@ export function keybindings() {
     }
 
     if (e.key === '?') {
-      $('#hud').toggle();
+      const hudEl = document.getElementById('hud');
+      if (hudEl) {
+        hudEl.style.display = hudEl.style.display === 'none' ? 'block' : 'none';
+      }
     }
   }, false);
 }
