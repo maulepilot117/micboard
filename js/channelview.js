@@ -280,7 +280,7 @@ export function renderDisplayList(dl) {
   const tx = micboard.transmitters;
   dl.forEach((e) => {
     let t;
-    if (e !== 0) {
+    if (e !== 0 && tx[e]) {
       t = document.getElementById('column-template').content.cloneNode(true);
       t.querySelector('div.col-sm').id = 'slot-' + tx[e].slot;
       updateViewOnly(t, tx[e]);
