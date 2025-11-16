@@ -3,6 +3,14 @@ dotstar.so
 .ftpconfig
 assets/
 *.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
 *.DS_Store
 static/serveit.py
 mictray/dist/*
