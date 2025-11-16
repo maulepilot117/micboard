@@ -10,8 +10,6 @@ function allSlots() {
   const slot = micboard.config.slots;
   const out = [];
 
-  console.log('allSlots() - demo mode:', micboard.url.demo, 'config.slots:', micboard.config.slots);
-
   if (micboard.url.demo) {
     return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   }
@@ -281,25 +279,19 @@ export function renderDisplayList(dl) {
   document.getElementById('micboard').innerHTML = '';
 
   if (micboard.url.demo) {
-    console.log('Demo mode - seeding transmitters');
     seedTransmitters(dl);
     autoRandom();
   }
 
   const tx = micboard.transmitters;
-  console.log('Transmitters array after seeding:', tx);
-
   dl.forEach((e) => {
-    console.log(`Processing slot ${e}, tx[${e}]:`, tx[e]);
     let t;
     if (e !== 0 && tx[e]) {
-      console.log(`  -> Rendering slot ${e} with data`);
       t = document.getElementById('column-template').content.cloneNode(true);
       t.querySelector('div.col-sm').id = 'slot-' + tx[e].slot;
       updateViewOnly(t, tx[e]);
       charts[tx[e].slot] = initChart(t, tx[e]);
     } else {
-      console.log(`  -> Rendering BLANK for slot ${e} (tx[e] is ${tx[e]})`);
       t = document.getElementById('column-template').content.cloneNode(true);
       t.querySelector('p.name').innerHTML = 'BLANK';
       t.querySelector('.col-sm').classList.add('blank');
