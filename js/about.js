@@ -8,6 +8,6 @@ import '../css/about.scss';
 import '../node_modules/@ibm/plex/css/ibm-plex.css';
 
 
-$(document).ready(() => {
+document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('version').innerHTML = 'Micboard ' + VERSION;
 });
