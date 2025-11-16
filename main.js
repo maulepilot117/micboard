@@ -17,6 +17,10 @@ function createWindow(url) {
     width: 400,
     height: 600,
     // frame: false,
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
   });
 
   win.loadURL(url);
@@ -35,7 +39,7 @@ function openConfigFolder(file) {
 
 function openLogFile() {
   const file = path.join(app.getPath('appData'), 'micboard', 'micboard.log');
-  shell.openItem(file);
+  shell.openPath(file);
 }
 
 
@@ -62,7 +66,7 @@ function restartMicboardServer() {
 }
 
 
-app.on('ready', () => {
+app.whenReady().then(() => {
   const icon = path.join(__dirname, 'build', 'trayTemplate.png').replace('app.asar', 'app.asar.unpacked');
   tray = new Tray(icon);
   const contextMenu = Menu.buildFromTemplate([
@@ -85,10 +89,13 @@ app.on('ready', () => {
     shell.openExternal('http://localhost:8058');
   }, 5000);
 });
-
-
-// app.on('ready', createPyProc);
-
 app.on('window-all-closed', e => e.preventDefault());
+
+app.on('activate', () => {
+  // On macOS, re-create window if dock icon clicked and no windows open
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow('http://localhost:8058');
+  }
+});
 
 app.on('will-quit', exitPyProc);
