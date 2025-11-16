@@ -1,0 +1,96 @@
+/**
+ * Main stylesheet for React components
+ * Imports Tailwind utilities and custom styles
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS layer for micboard-specific utilities */
+@layer components {
+  /* Status color classes matching vanilla JS implementation */
+  .status-good {
+    @apply bg-mb-green;
+  }
+
+  .status-prev-good {
+    @apply bg-mb-blue;
+  }
+
+  .status-replace {
+    @apply bg-mb-yellow;
+  }
+
+  .status-critical {
+    @apply bg-mb-red;
+  }
+
+  .status-unassigned {
+    @apply bg-mb-black;
+  }
+
+  .status-rx-error {
+    @apply bg-mb-purple;
+  }
+
+  .status-audio-peak {
+    @apply animate-pulse-fast;
+  }
+
+  /* Battery LED classes */
+  .batt-led-off {
+    @apply bg-gray-800;
+  }
+
+  .batt-led-danger {
+    @apply bg-mb-red;
+  }
+
+  .batt-led-warning {
+    @apply bg-mb-yellow;
+  }
+
+  .batt-led-good {
+    @apply bg-mb-green;
+  }
+}
+
+/* Global styles */
+body {
+  margin: 0;
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: 'IBM Plex Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Ensure React root takes full viewport */
+#react-root {
+  min-height: 100vh;
+}
+
+/* Status-based striped patterns for PREV_ states */
+.status-prev-replace {
+  background: repeating-linear-gradient(
+    45deg,
+    #ef9d51,
+    #ef9d51 10px,
+    #845a6d 10px,
+    #845a6d 20px
+  );
+}
+
+.status-prev-critical {
+  background: repeating-linear-gradient(
+    45deg,
+    #dc493a,
+    #dc493a 10px,
+    #845a6d 10px,
+    #845a6d 20px
+  );
+}
