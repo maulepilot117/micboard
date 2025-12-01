@@ -58,7 +58,8 @@ def micboard_json(network_devices):
 
 class IndexHandler(web.RequestHandler):
     def get(self):
-        self.render(config.app_dir('demo.html'))
+        # Serve React app from dist/app.html
+        self.render(config.app_dir('dist/app.html'))
 
 class AboutHandler(web.RequestHandler):
     def get(self):
@@ -172,6 +173,7 @@ def twisted():
         (r'/api/config', ConfigHandler),
         # (r'/restart/', MicboardReloadConfigHandler),
         (r'/static/(.*)', web.StaticFileHandler, {'path': config.app_dir('static')}),
+        (r'/assets/(.*)', web.StaticFileHandler, {'path': config.app_dir('dist/assets')}),
         (r'/bg/(.*)', NoCacheHandler, {'path': config.get_gif_dir()})
     ])
     # https://github.com/tornadoweb/tornado/issues/2308
