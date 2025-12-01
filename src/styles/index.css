@@ -1,96 +1,455 @@
 /**
- * Main stylesheet for React components
- * Imports Tailwind utilities and custom styles
+ * React-specific CSS overrides
+ * These styles are loaded AFTER the original SCSS files
+ * to provide React-specific fixes and overrides
+ *
+ * Note: We don't use @tailwind base; to avoid conflicting with Bootstrap
  */
 
-@tailwind base;
+/* Only import Tailwind components and utilities (no base/Preflight) */
 @tailwind components;
 @tailwind utilities;
 
-/* Custom CSS layer for micboard-specific utilities */
-@layer components {
-  /* Status color classes matching vanilla JS implementation */
-  .status-good {
-    @apply bg-mb-green;
-  }
+/*
+ * Override any problematic Bootstrap/Tailwind resets
+ * that might interfere with the original micboard styles
+ */
 
-  .status-prev-good {
-    @apply bg-mb-blue;
-  }
-
-  .status-replace {
-    @apply bg-mb-yellow;
-  }
-
-  .status-critical {
-    @apply bg-mb-red;
-  }
-
-  .status-unassigned {
-    @apply bg-mb-black;
-  }
-
-  .status-rx-error {
-    @apply bg-mb-purple;
-  }
-
-  .status-audio-peak {
-    @apply animate-pulse-fast;
-  }
-
-  /* Battery LED classes */
-  .batt-led-off {
-    @apply bg-gray-800;
-  }
-
-  .batt-led-danger {
-    @apply bg-mb-red;
-  }
-
-  .batt-led-warning {
-    @apply bg-mb-yellow;
-  }
-
-  .batt-led-good {
-    @apply bg-mb-green;
-  }
+/* Ensure #micboard uses CSS Grid as defined in style.scss */
+#micboard {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
+  align-items: flex-start;
+  align-content: flex-start;
+  grid-gap: 16px;
+  height: 100%;
 }
 
-/* Global styles */
-body {
+/* Critical: slots need position:relative for absolute children */
+#micboard .col-sm {
+  position: relative !important;
+  min-height: 180px;
+  background-color: var(--color-black, #262626);
+  padding: 0 !important;
+}
+
+/* Info drawer positioning context */
+#micboard .info-drawer {
+  position: relative !important;
+  height: 130px;
+  background-color: var(--color-black, #262626);
+}
+
+/* Battery bars - absolute positioning within slot */
+.battery-bars {
+  position: absolute !important;
+  display: table !important;
+  table-layout: fixed;
+  left: 0;
+  width: 100%;
+  background-color: var(--color-black, #262626);
+}
+
+.deskmode .battery-bars {
+  bottom: 115px;
+  height: 15px;
+}
+
+/* Battery bar cells */
+.battery-bar {
+  display: table-cell;
+  height: inherit;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--color-gray, #616161);
+  box-sizing: border-box;
+}
+
+/* Canvas for charts */
+canvas.slotgraph {
+  position: absolute !important;
+  left: 0;
+  width: 100%;
+}
+
+.deskmode canvas.slotgraph {
+  bottom: 15px;
+  height: 100px;
+}
+
+/* Diversity indicator at bottom */
+.diversity {
+  position: absolute !important;
+  display: table !important;
+  table-layout: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.deskmode .diversity {
+  height: 15px;
+}
+
+.diversity-bar {
+  display: table-cell;
+  height: inherit;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--color-gray, #616161);
+  box-sizing: border-box;
+}
+
+/* Text overlays in chartzone */
+.runtime, .offset, .quality, .frequency {
+  position: absolute !important;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.runtime {
+  left: 5px;
+  color: var(--color-green, #69B578);
+}
+
+.offset {
+  right: 5px;
+  color: var(--color-green, #69B578);
+}
+
+.quality {
+  left: 5px;
+  color: var(--color-purple, #845A6D);
+}
+
+.frequency {
+  right: 5px;
+  color: var(--color-red, #DC493A);
+}
+
+.deskmode .runtime,
+.deskmode .offset {
+  bottom: 75px;
+}
+
+.deskmode .quality,
+.deskmode .frequency {
+  bottom: 25px;
+}
+
+/* Error zone text positioning */
+.errorzone {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 100;
+  font-style: italic;
+  color: var(--color-yellow, #EF9D51);
+}
+
+.errortype, .ip, .rxinfo {
+  position: absolute !important;
+  right: 5px;
+}
+
+.deskmode .errortype {
+  bottom: 75px;
+}
+
+.deskmode .ip {
+  bottom: 55px;
+}
+
+.deskmode .rxinfo {
+  bottom: 35px;
+}
+
+/* Mic name header bar */
+.mic_name {
+  color: var(--color-white, #D7D7D7);
+}
+
+.deskmode .mic_name {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+}
+
+.mic_id {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.deskmode .mic_id {
+  display: inline;
+  font-weight: 400;
+  font-size: 18pt;
+  text-align: left;
+  padding-left: 1em;
+}
+
+.name {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 400;
+}
+
+.deskmode .name {
+  float: right;
+  display: inline;
+  font-size: 18pt;
+  padding-right: 1em;
+  text-align: right;
   margin: 0;
-  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Electrode - hidden in deskmode */
+.electrode {
+  position: absolute;
+  left: 0;
+  bottom: 250px;
+  height: 125px;
+  width: 100%;
+}
+
+.deskmode .electrode {
+  display: none;
+}
+
+/* Above-mid container padding in deskmode */
+.deskmode .above-mid,
+.deskmode#container {
+  padding-top: 46px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Blank slot styling */
+.blank .mic_name {
+  display: none !important;
+}
+
+.blank .electrode,
+.blank .info-drawer {
+  display: none !important;
+}
+
+/* Ensure React root takes full viewport */
+#root {
+  min-height: 100vh;
 }
 
 code {
   font-family: 'IBM Plex Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* Ensure React root takes full viewport */
-#react-root {
-  min-height: 100vh;
+/* Help screen (HUD) visibility override */
+#hud.container {
+  display: block !important;
+  position: absolute;
+  right: 25px;
+  bottom: 25px;
+  z-index: 50;
+  background-color: var(--color-white, #D7D7D7);
+  color: var(--color-black, #262626);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  border-radius: 12px;
+  padding: 1em;
+  max-width: 800px;
 }
 
-/* Status-based striped patterns for PREV_ states */
-.status-prev-replace {
-  background: repeating-linear-gradient(
-    45deg,
-    #ef9d51,
-    #ef9d51 10px,
-    #845a6d 10px,
-    #845a6d 20px
-  );
+/* Message board - connection error display */
+.message-board {
+  display: block !important;
+  background-color: var(--color-blue, #006494);
+  color: var(--color-white, #D7D7D7);
+  padding: 3em;
+  margin-top: 50px;
+  text-align: center;
 }
 
-.status-prev-critical {
-  background: repeating-linear-gradient(
-    45deg,
-    #dc493a,
-    #dc493a 10px,
-    #845a6d 10px,
-    #845a6d 20px
-  );
+.message-board a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.message-board h1 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  margin-bottom: 1em;
+}
+
+.message-board p {
+  font-size: 1.2em;
+}
+
+/* Settings panels (ConfigEditor, ExtendedEditor) */
+.settings-panel {
+  display: block !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-background, black);
+  color: var(--color-white, #D7D7D7);
+  padding-top: 60px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.settings-panel .container {
+  max-width: 1200px;
+  padding: 20px;
+}
+
+.settings-panel h2 {
+  color: var(--color-white, #D7D7D7);
+  margin-bottom: 20px;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.settings-panel h3 {
+  color: var(--color-white, #D7D7D7);
+  font-size: 1.2rem;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.settings-panel .form-control {
+  background-color: var(--color-black, #262626);
+  color: var(--color-white, #D7D7D7);
+  border-color: var(--color-gray, #616161);
+}
+
+.settings-panel .form-control:focus {
+  background-color: var(--color-black, #262626);
+  color: var(--color-yellow, #EF9D51);
+  border-color: var(--color-gray, #616161);
+  box-shadow: none;
+}
+
+.settings-panel .form-control::placeholder {
+  color: var(--color-gray, #616161);
+}
+
+.settings-panel select.form-control {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.settings-panel label {
+  color: var(--color-white, #D7D7D7);
+  font-weight: bold;
+}
+
+.settings-panel .row {
+  align-items: center;
+}
+
+.settings-panel .btn {
+  margin-right: 5px;
+}
+
+/* Config editor specific */
+.config-editor .slots-config {
+  background-color: var(--color-black, #262626);
+  border: 1px solid var(--color-gray, #616161);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.config-editor .discovered-devices {
+  background-color: var(--color-black, #262626);
+  border: 1px solid var(--color-gray, #616161);
+  border-radius: 8px;
+  padding: 15px;
+}
+
+/* Extended editor specific */
+.extended-editor .slots-list {
+  background-color: var(--color-black, #262626);
+  border: 1px solid var(--color-gray, #616161);
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.extended-editor textarea.form-control {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Group editor (sidebar) - override to show when active */
+.sidebar-nav {
+  display: block !important;
+  width: 300px !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  padding-top: 50px;
+  background-color: var(--color-gray, #616161);
+  overflow-x: hidden;
+  z-index: 100;
+}
+
+.sidebar-nav h1 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  text-align: center;
+  color: var(--color-white, #D7D7D7);
+  padding: 0.5em;
+  font-size: 1.5rem;
+}
+
+.sidebar-nav h3 {
+  color: var(--color-white, #D7D7D7);
+  font-size: 1rem;
+  padding: 0.5em 1em;
+  margin: 0;
+}
+
+.sidebar-nav .form-group {
+  padding: 0 1em;
+}
+
+.sidebar-nav .form-control {
+  background-color: var(--color-black, #262626);
+  color: var(--color-white, #D7D7D7);
+  border-color: var(--color-black, #262626);
+}
+
+.sidebar-nav .input-group-text {
+  background-color: var(--color-black, #262626);
+  color: var(--color-white, #D7D7D7);
+  border-color: var(--color-black, #262626);
+}
+
+.sidebar-nav .slot-item {
+  padding: 8px 1em;
+  color: var(--color-white, #D7D7D7);
+  background-color: var(--color-black, #262626);
+  margin: 2px 1em;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sidebar-nav .slot-item.available:hover {
+  background-color: var(--color-blue, #006494);
+}
+
+.sidebar-nav .slot-prototype-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.sidebar-nav .button-group {
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-nav .button-group .btn {
+  width: 100%;
 }

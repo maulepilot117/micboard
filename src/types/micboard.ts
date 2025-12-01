@@ -3,7 +3,7 @@
  * Based on the vanilla JavaScript implementation
  */
 
-export type DeviceType = 'uhfr' | 'qlxd' | 'ulxd' | 'axtd' | 'p10t';
+export type DeviceType = 'uhfr' | 'qlxd' | 'ulxd' | 'axtd' | 'p10t' | 'offline';
 
 export type DeviceStatus =
   | 'GOOD'
@@ -52,6 +52,7 @@ export interface Group {
   title: string;
   hide_charts: boolean;
   slots: number[];
+  group?: number; // Group number/index from API
 }
 
 export interface MicboardConfig {
@@ -63,12 +64,13 @@ export interface DiscoveredDevice {
   type: DeviceType;
   channels: number;
   name: string;
+  device?: string; // Device identifier
 }
 
 export type DisplayMode = 'deskmode' | 'tvmode';
 export type InfoDrawerMode = 'elinfo00' | 'elinfo01' | 'elinfo10' | 'elinfo11';
 export type BackgroundMode = 'NONE' | 'IMG' | 'MP4';
-export type SettingsMode = 'NONE' | 'CONFIG' | 'EXTENDED';
+export type SettingsMode = 'NONE' | 'CONFIG' | 'EXTENDED' | 'GROUP';
 export type ConnectionStatus = 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED';
 
 export interface URLParams {

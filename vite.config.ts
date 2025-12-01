@@ -10,7 +10,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        app: './demo.html',
+        app: './app.html',
       },
     },
   },
@@ -24,6 +24,10 @@ export default defineConfig({
       '/data.json': {
         target: 'http://localhost:8058',
         changeOrigin: true,
+      },
+      '/ws': {
+        target: 'ws://localhost:8058',
+        ws: true,
       },
     },
   },
