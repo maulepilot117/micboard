@@ -9,7 +9,7 @@
     "binary": "pyinstaller py/micboard.spec",
     "build:legacy": "webpack --progress --config=webpack.config.js",
     "build:react": "tsc && vite build",
-    "build": "npm run build:legacy && npm run build:react",
+    "build": "npm run build:react",
     "preview": "vite preview",
     "app": "electron .",
     "pack": "node electron-build.js",

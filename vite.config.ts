@@ -6,8 +6,10 @@ export default defineConfig({
   plugins: [react()],
   root: '.',
   publicDir: 'static',
+  base: '/', // Serve assets from root
   build: {
     outDir: 'dist',
+    assetsDir: 'assets',
     rollupOptions: {
       input: {
         app: './app.html',
