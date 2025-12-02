@@ -73,8 +73,9 @@
 }
 
 .deskmode .slotgraph {
-  bottom: 15px;
-  height: 100px !important;
+  top: 38px;
+  bottom: 17px;
+  height: auto !important;
 }
 
 /* Ensure uPlot canvas fills the container */
@@ -111,8 +112,14 @@
 .runtime, .offset, .quality, .frequency {
   position: absolute !important;
   font-family: 'IBM Plex Mono', monospace;
-  font-weight: 100;
-  font-style: italic;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 14px;
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.9),
+    0 0 8px rgba(0, 0, 0, 0.7),
+    1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
 }
 
 .runtime {
@@ -135,14 +142,30 @@
   color: var(--color-red, #DC493A);
 }
 
-.deskmode .runtime,
-.deskmode .offset {
-  bottom: 75px;
+.deskmode .runtime {
+  top: 18px;
+  bottom: auto;
+  left: 5px;
 }
 
-.deskmode .quality,
+.deskmode .offset {
+  top: 18px;
+  bottom: auto;
+  right: 5px;
+}
+
+.deskmode .quality {
+  top: 18px;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .deskmode .frequency {
-  bottom: 25px;
+  top: 18px;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Error zone text positioning */

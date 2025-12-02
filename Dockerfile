@@ -5,16 +5,18 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
 
-COPY js ./js
+# Copy source files for Vite build
+COPY src ./src
 COPY css ./css
-COPY webpack.config.js babel.config.json ./
+COPY index.html app.html vite.config.ts tsconfig.json tsconfig.node.json tailwind.config.js postcss.config.js ./
 
+# Build React app with Vite
 RUN npm run build
 
 # Python runtime stage
 FROM python:3.11-slim
 
-MAINTAINER Karl Swanson <karlcswanson@gmail.com>
+LABEL maintainer="Karl Swanson <karlcswanson@gmail.com>"
 
 WORKDIR /usr/src/app
 
@@ -24,11 +26,14 @@ RUN pip3 install --no-cache-dir -r py/requirements.txt
 
 # Copy application
 COPY py ./py
-COPY demo.html index.html about.html ./
-COPY democonfig.json ./
+COPY demo.html index.html ./
+COPY democonfig.json package.json ./
 
-# Copy built assets from frontend stage
-COPY --from=frontend /usr/src/app/static ./static
+# Copy static assets (legacy webpack build for about page)
+COPY static ./static
+
+# Copy built React app from frontend stage
+COPY --from=frontend /usr/src/app/dist ./dist
 
 EXPOSE 8058
 

@@ -117,9 +117,11 @@ canvas.slotgraph {
   bottom: 180px;
   right: 5px;
   font-family: 'IBM Plex Mono';
-  font-weight: 100;
-  font-style: italic;
+  font-weight: 500;
+  font-size: 14px;
   color: var(--color-green);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.7), 1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
 }
 
 .frequency {
@@ -127,9 +129,11 @@ canvas.slotgraph {
   bottom: 80px;
   right: 5px;
   font-family: 'IBM Plex Mono';
-  font-weight: 100;
-  font-style: italic;
+  font-weight: 500;
+  font-size: 14px;
   color: var(--color-red);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.7), 1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
 }
 
 .runtime {
@@ -137,9 +141,11 @@ canvas.slotgraph {
   bottom: 180px;
   left: 5px;
   font-family: 'IBM Plex Mono';
-  font-weight: 100;
-  font-style: italic;
+  font-weight: 500;
+  font-size: 14px;
   color: var(--color-green);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.7), 1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
 }
 
 
@@ -147,10 +153,12 @@ canvas.slotgraph {
   position: absolute;
   bottom: 80px;
   left: 5px;
-  // font-family: 'IBM Plex Mono';
-  // font-weight: 100;
-  // font-style: italic;
+  font-family: 'IBM Plex Mono';
+  font-weight: 500;
+  font-size: 14px;
   color: var(--color-purple);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.7), 1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
 }
 
 .diversity {
@@ -441,28 +449,36 @@ canvas.slotgraph {
   }
 
   .offset {
-    bottom: 75px;
+    top: 18px;
+    bottom: auto;
     right: 5px;
   }
 
   .frequency {
-    bottom: 25px;
-    right: 5px;
+    top: 18px;
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .runtime {
-    bottom: 75px;
+    top: 18px;
+    bottom: auto;
     left: 5px;
   }
 
   .quality {
-    bottom: 25px;
-    left: 5px;
+    top: 18px;
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
-  canvas.slotgraph {
-    height:100px;
-    bottom:15px;
+  canvas.slotgraph,
+  .slotgraph {
+    top: 38px;
+    bottom: 17px;
+    height: auto;
   }
 
   .diversity {

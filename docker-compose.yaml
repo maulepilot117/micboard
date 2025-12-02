@@ -3,6 +3,7 @@ version: '2'
 services:
   # -------- Micboard -----------
   micboard:
+    build: .
     image: micboard
     container_name: micboard
     ports:
