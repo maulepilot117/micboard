@@ -47,6 +47,8 @@ export const useDataConnection = (isEnabled: boolean) => {
     setMp4List,
     setImgList,
     setLocalURL,
+    switchGroup,
+    currentGroup,
   } = useMicboardStore();
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -80,6 +82,9 @@ export const useDataConnection = (isEnabled: boolean) => {
           groupsObj[groupNum] = group;
         });
         setGroups(groupsObj);
+
+        // Populate displayList with current group (defaults to 0 = all devices)
+        switchGroup(currentGroup);
       }
 
       // Transform receivers[].tx[] to transmitters object keyed by slot
