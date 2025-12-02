@@ -1,0 +1,50 @@
+services:
+  # Micboard running in Docker so it can reach simulator IPs
+  micboard:
+    build:
+      context: ..
+      dockerfile: simulators/Dockerfile.micboard
+    ports:
+      - "8058:8058"
+    networks:
+      shure_sim:
+        ipv4_address: 172.28.1.2
+    volumes:
+      - micboard-config:/root/.config/micboard
+
+  qlxd-sim-1:
+    build: .
+    environment:
+      - DEVICE_ID=QLXD-001
+      - CHANNELS=4
+    networks:
+      shure_sim:
+        ipv4_address: 172.28.1.10
+
+  qlxd-sim-2:
+    build: .
+    environment:
+      - DEVICE_ID=QLXD-002
+      - CHANNELS=4
+    networks:
+      shure_sim:
+        ipv4_address: 172.28.1.11
+
+  qlxd-sim-3:
+    build: .
+    environment:
+      - DEVICE_ID=QLXD-003
+      - CHANNELS=2
+    networks:
+      shure_sim:
+        ipv4_address: 172.28.1.12
+
+networks:
+  shure_sim:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.1.0/24
+
+volumes:
+  micboard-config:

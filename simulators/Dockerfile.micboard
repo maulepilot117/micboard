@@ -1,0 +1,22 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY py/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+COPY py/ ./py/
+COPY dist/ ./dist/
+COPY package.json .
+COPY democonfig.json .
+COPY dcid.json .
+
+# Config directory
+RUN mkdir -p /root/.config/micboard
+
+EXPOSE 8058
+
+WORKDIR /app/py
+CMD ["python", "-u", "micboard.py"]

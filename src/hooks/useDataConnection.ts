@@ -7,13 +7,20 @@ import { useEffect, useRef } from 'react';
 import { useMicboardStore } from '../store/micboard-store';
 import type { Transmitter, SlotConfig, Group, DiscoveredDevice } from '../types/micboard';
 
+interface Receiver {
+  ip: string;
+  type: string;
+  status: string;
+  tx: Transmitter[];
+}
+
 interface DataResponse {
   config?: {
     slots: SlotConfig[];
     groups: Group[];
   };
   discovered?: DiscoveredDevice[];
-  transmitters?: Record<number, Transmitter>;
+  receivers?: Receiver[];
   mp4?: string[];
   jpg?: string[];
   url?: string;
@@ -22,19 +29,8 @@ interface DataResponse {
 interface ChartUpdate {
   slot: number;
   timestamp: number;
-  audio?: number;
-  rf?: number;
-  audio_l?: number;
-  audio_r?: number;
-}
-
-interface DataUpdate {
-  slot: number;
-  data: Partial<Transmitter>;
-}
-
-interface GroupUpdate {
-  groups: Group[];
+  audio_level?: number;
+  rf_level?: number;
 }
 
 const DATA_URL = '/data.json';
@@ -86,9 +82,21 @@ export const useDataConnection = (isEnabled: boolean) => {
         setGroups(groupsObj);
       }
 
-      // Update transmitters if present
-      if (data.transmitters) {
-        setTransmitters(data.transmitters);
+      // Transform receivers[].tx[] to transmitters object keyed by slot
+      if (data.receivers) {
+        const transmitters: Record<number, Transmitter> = {};
+        for (const receiver of data.receivers) {
+          if (receiver.tx) {
+            for (const tx of receiver.tx) {
+              // Add receiver info to transmitter
+              transmitters[tx.slot] = {
+                ...tx,
+                ip: receiver.ip,
+              };
+            }
+          }
+        }
+        setTransmitters(transmitters);
       }
 
       // Update discovered devices
@@ -133,37 +141,37 @@ export const useDataConnection = (isEnabled: boolean) => {
         try {
           const message = JSON.parse(event.data);
 
-          switch (message.type) {
-            case 'chart-update':
-              // Real-time chart data
-              const chartData = message.data as ChartUpdate;
+          // Backend sends: {"chart-update": [...], "data-update": [...], "group-update": [...]}
+          // Process each update type if present
+
+          if (message['chart-update']) {
+            // Real-time chart data - array of updates
+            const chartUpdates = message['chart-update'] as ChartUpdate[];
+            for (const chartData of chartUpdates) {
               updateTransmitter(chartData.slot, {
-                audio_level: chartData.audio,
-                rf_level: chartData.rf,
-                audio_level_l: chartData.audio_l,
-                audio_level_r: chartData.audio_r,
+                audio_level: chartData.audio_level,
+                rf_level: chartData.rf_level,
               });
-              break;
+            }
+          }
 
-            case 'data-update':
-              // Slot data update
-              const dataUpdate = message.data as DataUpdate;
-              updateTransmitter(dataUpdate.slot, dataUpdate.data);
-              break;
+          if (message['data-update']) {
+            // Slot data updates - array of transmitter data
+            const dataUpdates = message['data-update'] as Transmitter[];
+            for (const tx of dataUpdates) {
+              updateTransmitter(tx.slot, tx);
+            }
+          }
 
-            case 'group-update':
-              // Group configuration update
-              const groupUpdate = message.data as GroupUpdate;
-              const groupsObj2: Record<number, Group> = {};
-              groupUpdate.groups.forEach((group, index) => {
-                const groupNum = group.group ?? index + 1;
-                groupsObj2[groupNum] = group;
-              });
-              setGroups(groupsObj2);
-              break;
-
-            default:
-              console.warn('Unknown WebSocket message type:', message.type);
+          if (message['group-update']) {
+            // Group configuration updates
+            const groupUpdates = message['group-update'] as Group[];
+            const groupsObj2: Record<number, Group> = {};
+            groupUpdates.forEach((group, index) => {
+              const groupNum = group.group ?? index + 1;
+              groupsObj2[groupNum] = group;
+            });
+            setGroups(groupsObj2);
           }
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
