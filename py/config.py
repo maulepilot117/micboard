@@ -10,10 +10,15 @@ from shutil import copyfile
 import shure
 import offline
 import tornado_server
+import db
 
 APPNAME = 'micboard'
 
 CONFIG_FILE_NAME = 'config.json'
+DB_FILE_NAME = 'micboard.db'
+
+# Global ConfigStore instance
+_config_store = None
 
 FORMAT = '%(asctime)s %(levelname)s:%(message)s'
 
@@ -141,15 +146,102 @@ def parse_args():
     return vars(args)
 
 
+def db_file():
+    """Return path to SQLite database file."""
+    return config_path(DB_FILE_NAME)
+
+
+def json_config_exists():
+    """Check if a JSON config file exists (for migration)."""
+    try:
+        # Check app dir first (bundled config)
+        if os.path.exists(app_dir(CONFIG_FILE_NAME)):
+            return app_dir(CONFIG_FILE_NAME)
+        # Check user config path
+        elif os.path.exists(config_path(CONFIG_FILE_NAME)):
+            return config_path(CONFIG_FILE_NAME)
+    except Exception:
+        pass
+    return None
+
+
 def config():
     global args
+    global config_tree
+    global gif_dir
+    global _config_store
+
     args = parse_args()
     logging_init()
-    read_json_config(config_file())
-    uuid_init()
 
+    # Initialize SQLite store
+    db_path = db_file()
+    _config_store = db.init_store(db_path)
+
+    # Check if migration from JSON is needed
+    json_path = json_config_exists()
+    pre_sqlite_path = config_path(CONFIG_FILE_NAME + '.pre-sqlite')
+
+    if not _config_store.is_migrated():
+        if json_path:
+            logging.info(f"Migrating config from {json_path} to SQLite...")
+            if _config_store.migrate_from_json(json_path):
+                # Rename old file to prevent re-migration
+                backup_path = json_path + '.pre-sqlite'
+                os.rename(json_path, backup_path)
+                logging.info(f"Migration complete. Original config backed up to {backup_path}")
+            else:
+                logging.error("Migration failed, falling back to demo config")
+                _load_demo_config()
+        elif os.path.exists(pre_sqlite_path):
+            # Re-migrate from backup if DB was deleted
+            logging.info(f"Re-migrating from backup {pre_sqlite_path}...")
+            _config_store.migrate_from_json(pre_sqlite_path)
+        else:
+            # Fresh install - load demo config
+            logging.info("No existing config found, loading demo config")
+            _load_demo_config()
+
+    # Run integrity check
+    if not _config_store.integrity_check():
+        logging.error("Database integrity check failed!")
+        # Try to recover from backup
+        if os.path.exists(pre_sqlite_path):
+            logging.info("Attempting recovery from JSON backup...")
+            os.remove(db_path)
+            _config_store = db.init_store(db_path)
+            _config_store.migrate_from_json(pre_sqlite_path)
+
+    # Load config into memory
+    config_tree = _config_store.get_all()
+
+    # Initialize network devices from config
+    _init_devices_from_config()
+
+    uuid_init()
+    gif_dir = get_gif_dir()
+    config_tree['micboard_version'] = get_version_number()
 
     logging.info('Starting Micboard {}'.format(config_tree['micboard_version']))
+
+
+def _load_demo_config():
+    """Load demo config into SQLite database."""
+    demo_path = app_dir('democonfig.json')
+    if os.path.exists(demo_path):
+        _config_store.migrate_from_json(demo_path)
+    else:
+        logging.error("Demo config not found!")
+
+
+def _init_devices_from_config():
+    """Initialize network devices from config_tree slots."""
+    for chan in config_tree.get('slots', []):
+        if chan['type'] in ['uhfr', 'qlxd', 'ulxd', 'axtd', 'p10t']:
+            netDev = shure.check_add_network_device(chan['ip'], chan['type'])
+            netDev.add_channel_device(chan)
+        elif chan['type'] == 'offline':
+            offline.add_device(chan)
 
 def reconfig(slots):
     tornado_server.SocketHandler.close_all_ws()
@@ -196,12 +288,21 @@ def read_json_config(file):
     gif_dir = get_gif_dir()
     config_tree['micboard_version'] = get_version_number()
 
-def write_json_config(data):
-    with open(config_file(), 'w') as f:
-        json.dump(data, f, indent=2, separators=(',', ': '), sort_keys=True)
-
 def save_current_config():
-    return write_json_config(config_tree)
+    """Save entire config_tree to SQLite database."""
+    if _config_store is None:
+        logging.warning("ConfigStore not initialized, cannot save config")
+        return
+    _config_store.save_all(config_tree)
+
+
+def update_planning_center_config(pc_data):
+    """Update Planning Center configuration in both memory and SQLite."""
+    config_tree['planning_center'] = pc_data
+    if _config_store is not None:
+        _config_store.update_planning_center(pc_data)
+    else:
+        logging.warning("ConfigStore not initialized, Planning Center config not persisted")
 
 def get_group_by_number(group_number):
     for group in config_tree['groups']:
@@ -210,6 +311,7 @@ def get_group_by_number(group_number):
     return None
 
 def update_group(data):
+    """Update a group in both memory and SQLite."""
     group_update_list.append(data)
     group = get_group_by_number(data['group'])
     if not group:
@@ -221,7 +323,11 @@ def update_group(data):
     group['title'] = data['title']
     group['hide_charts'] = data['hide_charts']
 
-    save_current_config()
+    # Save to SQLite (granular update)
+    if _config_store is not None:
+        _config_store.update_group(data)
+    else:
+        logging.warning("ConfigStore not initialized, group update not persisted")
 
 def get_slot_by_number(slot_number):
     for slot in config_tree['slots']:
@@ -230,7 +336,12 @@ def get_slot_by_number(slot_number):
     return None
 
 def update_slot(data):
+    """Update a slot's extended fields in both memory and SQLite."""
     slot_cfg = get_slot_by_number(data['slot'])
+    if not slot_cfg:
+        logging.warning(f"Slot {data['slot']} not found")
+        return
+
     save_name = False
 
     if data.get('extended_id'):
@@ -248,10 +359,14 @@ def update_slot(data):
     if save_name:
         try:
             slot_cfg['chan_name_raw'] = shure.get_network_device_by_slot(data['slot']).chan_name_raw
-        except:
+        except Exception:
             pass
 
     elif 'chan_name_raw' in slot_cfg:
         slot_cfg.pop('chan_name_raw')
 
-    save_current_config()
+    # Save to SQLite (granular update)
+    if _config_store is not None:
+        _config_store.update_slot(slot_cfg)
+    else:
+        logging.warning("ConfigStore not initialized, slot update not persisted")

@@ -223,9 +223,8 @@ def get_planning_center_config() -> dict:
 
 
 def save_planning_center_config(pc_config: dict) -> None:
-    """Save Planning Center configuration to config tree"""
-    config.config_tree['planning_center'] = pc_config
-    config.save_current_config()
+    """Save Planning Center configuration to config tree and SQLite"""
+    config.update_planning_center_config(pc_config)
 
 
 def sync_assignments() -> dict:
