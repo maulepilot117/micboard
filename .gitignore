@@ -30,3 +30,9 @@ static/data2.json
 static/fonts/*
 static/*.js*
 config/*
+PHASE3_RESTART.md
+REACT_MIGRATION_STATUS.md
+REACT_RESTORATION_PLAN.md
+SPECFLOW_ANALYSIS.md
+VIRTUAL_RECEIVER_FLOW_ANALYSIS.md
+plans/

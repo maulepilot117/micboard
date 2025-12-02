@@ -10,7 +10,7 @@ services:
       shure_sim:
         ipv4_address: 172.28.1.2
     volumes:
-      - micboard-config:/root/.config/micboard
+      - micboard-data:/root/.local/share/micboard
 
   qlxd-sim-1:
     build: .
@@ -47,4 +47,4 @@ networks:
         - subnet: 172.28.1.0/24
 
 volumes:
-  micboard-config:
+  micboard-data:

@@ -1,22 +1,18 @@
 {
-  "port" : 8058,
-  "groups": [
-	  {
-      "group": 1,
-		  "slots" : [1,3,2,4],
-      "title": "Group 1 Title"
-	  },
-	  {
-      "group": 2,
-		  "slots" : [4,3,2,1],
-      "title": "Group 2 Title"
-	  },
-    {
-      "group" : 9,
-		  "slots" : [1,2,3,4],
-      "title": "Group 9 Title"
-	  }
-  ],
+  "port": 8058,
   "slots": [
+    {"slot": 1, "type": "qlxd", "ip": "172.28.1.10", "channel": 1},
+    {"slot": 2, "type": "qlxd", "ip": "172.28.1.10", "channel": 2},
+    {"slot": 3, "type": "qlxd", "ip": "172.28.1.10", "channel": 3},
+    {"slot": 4, "type": "qlxd", "ip": "172.28.1.10", "channel": 4},
+    {"slot": 5, "type": "qlxd", "ip": "172.28.1.11", "channel": 1},
+    {"slot": 6, "type": "qlxd", "ip": "172.28.1.11", "channel": 2},
+    {"slot": 7, "type": "qlxd", "ip": "172.28.1.11", "channel": 3},
+    {"slot": 8, "type": "qlxd", "ip": "172.28.1.11", "channel": 4},
+    {"slot": 9, "type": "qlxd", "ip": "172.28.1.12", "channel": 1},
+    {"slot": 10, "type": "qlxd", "ip": "172.28.1.12", "channel": 2}
+  ],
+  "groups": [
+    {"group": 1, "title": "All Mics", "slots": [1,2,3,4,5,6,7,8,9,10]}
   ]
 }
