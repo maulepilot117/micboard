@@ -45,8 +45,8 @@
     "react-router-dom": "^6.20.1",
     "sass": "^1.70.0",
     "sass-loader": "^14.1.0",
-    "smoothie": "^1.36.1",
     "style-loader": "^3.3.4",
+    "uplot": "^1.6.32",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4",
     "zustand": "^4.4.7"

@@ -65,16 +65,23 @@
   box-sizing: border-box;
 }
 
-/* Canvas for charts */
-canvas.slotgraph {
+/* Container for charts (uPlot uses div, SmoothieChart used canvas) */
+.slotgraph {
   position: absolute !important;
   left: 0;
-  width: 100%;
+  width: 100% !important;
 }
 
-.deskmode canvas.slotgraph {
+.deskmode .slotgraph {
   bottom: 15px;
-  height: 100px;
+  height: 100px !important;
+}
+
+/* Ensure uPlot canvas fills the container */
+.slotgraph .uplot,
+.slotgraph .uplot canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Diversity indicator at bottom */

@@ -1,9 +1,10 @@
 /**
- * AudioChart component - Real-time audio/RF level charts using SmoothieChart
+ * AudioChart component - Real-time audio/RF level charts using uPlot
  */
 
-import React, { useEffect, useRef } from 'react';
-import { SmoothieChart, TimeSeries } from 'smoothie';
+import React, { useEffect, useRef, useCallback } from 'react';
+import uPlot from 'uplot';
+import 'uplot/dist/uPlot.min.css';
 import { useMicboardStore } from '../store/micboard-store';
 
 interface AudioChartProps {
@@ -11,115 +12,138 @@ interface AudioChartProps {
   type: string;
 }
 
+// Number of data points to display (5 seconds at ~100ms updates)
+const MAX_POINTS = 50;
+
+// Custom type for our data arrays (uPlot.AlignedData includes TypedArray which lacks shift/push)
+type ChartData = [number[], (number | null)[], (number | null)[]];
+
 const AudioChart: React.FC<AudioChartProps> = ({ slot, type }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chartRef = useRef<SmoothieChart | null>(null);
-  const audioSeriesRef = useRef<TimeSeries | null>(null);
-  const rfSeriesRef = useRef<TimeSeries | null>(null);
-  const audioLSeriesRef = useRef<TimeSeries | null>(null);
-  const audioRSeriesRef = useRef<TimeSeries | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<uPlot | null>(null);
+  const dataRef = useRef<ChartData>([[], [], []]);
 
   const { transmitters } = useMicboardStore();
   const transmitter = transmitters[slot];
 
+  // Initialize chart
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!containerRef.current) return;
 
-    // Create chart
-    const chart = new SmoothieChart({
-      millisPerPixel: 25,
-      grid: {
-        fillStyle: 'transparent',
-        strokeStyle: 'transparent',
-        borderVisible: false,
-      },
-      labels: { disabled: true },
-      maxValue: 200,
-      minValue: 0,
-    });
-
-    chartRef.current = chart;
-
-    // Create time series based on device type
-    if (type === 'p10t') {
-      // IEM - stereo audio levels
-      const audioLSeries = new TimeSeries();
-      const audioRSeries = new TimeSeries();
-      audioLSeriesRef.current = audioLSeries;
-      audioRSeriesRef.current = audioRSeries;
-
-      chart.addTimeSeries(audioLSeries, {
-        strokeStyle: '#69B578',
-        lineWidth: 2,
-      });
-
-      chart.addTimeSeries(audioRSeries, {
-        strokeStyle: '#69B578',
-        lineWidth: 2,
-      });
-    } else {
-      // Microphone - audio and RF levels
-      const audioSeries = new TimeSeries();
-      const rfSeries = new TimeSeries();
-      audioSeriesRef.current = audioSeries;
-      rfSeriesRef.current = rfSeries;
-
-      chart.addTimeSeries(audioSeries, {
-        strokeStyle: '#69B578', // Green
-        lineWidth: 2,
-      });
-
-      chart.addTimeSeries(rfSeries, {
-        strokeStyle: '#DC493A', // Red
-        lineWidth: 2,
-      });
+    // Clear any existing chart
+    if (chartRef.current) {
+      chartRef.current.destroy();
     }
 
-    // Start streaming to canvas
-    chart.streamTo(canvasRef.current, 0);
+    // Initialize data arrays
+    const now = Date.now() / 1000;
+    const times: number[] = [];
+    const series1: (number | null)[] = [];
+    const series2: (number | null)[] = [];
+
+    for (let i = 0; i < MAX_POINTS; i++) {
+      times.push(now - (MAX_POINTS - i) * 0.1);
+      series1.push(null);
+      series2.push(null);
+    }
+
+    dataRef.current = [times, series1, series2] as ChartData;
+
+    // Get container dimensions (CSS sets these via .slotgraph class)
+    const rect = containerRef.current.getBoundingClientRect();
+    const width = rect.width || 200;
+    const height = rect.height || 100;
+
+    // Chart options
+    const opts: uPlot.Options = {
+      width,
+      height,
+      cursor: { show: false },
+      legend: { show: false },
+      scales: {
+        x: { time: false },
+        y: { range: [0, 200] },
+      },
+      axes: [
+        { show: false },
+        { show: false },
+      ],
+      series: [
+        {}, // x-axis timestamps
+        {
+          stroke: '#69B578',
+          width: 2,
+          label: type === 'p10t' ? 'Audio L' : 'Audio',
+        },
+        {
+          stroke: type === 'p10t' ? '#69B578' : '#DC493A',
+          width: 2,
+          label: type === 'p10t' ? 'Audio R' : 'RF',
+        },
+      ],
+    };
+
+    // Create chart
+    const chart = new uPlot(opts, dataRef.current, containerRef.current);
+    chartRef.current = chart;
+
+    // Handle window resize
+    const handleResize = () => {
+      if (chartRef.current && containerRef.current) {
+        const newRect = containerRef.current.getBoundingClientRect();
+        chartRef.current.setSize({ width: newRect.width, height: newRect.height });
+      }
+    };
+    window.addEventListener('resize', handleResize);
 
     // Cleanup
     return () => {
+      window.removeEventListener('resize', handleResize);
       if (chartRef.current) {
-        chartRef.current.stop();
+        chartRef.current.destroy();
         chartRef.current = null;
       }
     };
   }, [type]);
 
   // Update chart data when transmitter data changes
-  useEffect(() => {
-    if (!transmitter) return;
+  const updateChart = useCallback(() => {
+    if (!chartRef.current || !transmitter) return;
 
-    const timestamp = Date.now();
+    const now = Date.now() / 1000;
+    const [times, series1, series2] = dataRef.current;
+
+    // Shift data and add new point
+    times.shift();
+    times.push(now);
+
+    series1.shift();
+    series2.shift();
 
     if (type === 'p10t') {
-      // IEM - update stereo audio levels
-      if (audioLSeriesRef.current && transmitter.audio_level_l !== undefined) {
-        audioLSeriesRef.current.append(timestamp, transmitter.audio_level_l);
-      }
-      if (audioRSeriesRef.current && transmitter.audio_level_r !== undefined) {
-        audioRSeriesRef.current.append(timestamp, transmitter.audio_level_r);
-      }
+      // IEM - stereo audio levels
+      series1.push(transmitter.audio_level_l ?? null);
+      series2.push(transmitter.audio_level_r ?? null);
     } else {
-      // Microphone - update audio and RF levels
-      if (audioSeriesRef.current && transmitter.audio_level !== undefined) {
-        // Scale audio to 0-100 range for display
-        audioSeriesRef.current.append(timestamp, transmitter.audio_level);
-      }
-      if (rfSeriesRef.current && transmitter.rf_level !== undefined) {
-        // Scale RF to 0-50 range and offset by 100 for display separation
-        rfSeriesRef.current.append(timestamp, 100 + transmitter.rf_level);
-      }
+      // Microphone - audio and RF levels
+      series1.push(transmitter.audio_level ?? null);
+      // Offset RF by 100 for visual separation
+      series2.push(transmitter.rf_level !== undefined ? 100 + transmitter.rf_level : null);
     }
+
+    // Update chart
+    chartRef.current.setData(dataRef.current);
   }, [transmitter, type]);
 
+  // Listen for transmitter updates
+  useEffect(() => {
+    updateChart();
+  }, [transmitter, updateChart]);
+
   return (
-    <canvas
-      ref={canvasRef}
+    <div
+      ref={containerRef}
       className="slotgraph"
-      width={200}
-      height={60}
     />
   );
 };
