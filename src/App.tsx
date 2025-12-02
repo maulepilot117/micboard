@@ -12,6 +12,7 @@ import QRModal from './components/QRModal';
 import GroupEditor from './components/GroupEditor';
 import ExtendedEditor from './components/ExtendedEditor';
 import ConfigEditor from './components/ConfigEditor';
+import PlanningCenterSettings from './components/PlanningCenterSettings';
 import MessageBoard from './components/MessageBoard';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useDataConnection } from './hooks/useDataConnection';
@@ -74,6 +75,7 @@ export const App: React.FC = () => {
         {settingsMode === 'CONFIG' && <ConfigEditor />}
         {settingsMode === 'EXTENDED' && <ExtendedEditor />}
         {settingsMode === 'GROUP' && <GroupEditor />}
+        {settingsMode === 'PLANNING_CENTER' && <PlanningCenterSettings />}
 
         {/* Hidden element for demo mode indicator */}
         {isDemo && (

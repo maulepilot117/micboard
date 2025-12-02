@@ -133,6 +133,12 @@ export const useKeyboardShortcuts = ({
           // TODO: Show bulk paste textarea
           break;
 
+        // Planning Center settings
+        case 'p':
+        case 'P':
+          setSettingsMode('PLANNING_CENTER');
+          break;
+
         // Device configuration editor
         case 's':
         case 'S':

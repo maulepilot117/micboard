@@ -70,7 +70,7 @@ export interface DiscoveredDevice {
 export type DisplayMode = 'deskmode' | 'tvmode';
 export type InfoDrawerMode = 'elinfo00' | 'elinfo01' | 'elinfo10' | 'elinfo11';
 export type BackgroundMode = 'NONE' | 'IMG' | 'MP4';
-export type SettingsMode = 'NONE' | 'CONFIG' | 'EXTENDED' | 'GROUP';
+export type SettingsMode = 'NONE' | 'CONFIG' | 'EXTENDED' | 'GROUP' | 'PLANNING_CENTER';
 export type ConnectionStatus = 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED';
 
 export interface URLParams {

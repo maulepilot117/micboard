@@ -164,7 +164,6 @@ const ConfigEditor: React.FC = () => {
                   onChange={(e) =>
                     handleSlotChange(index, 'ip', e.target.value)
                   }
-                  disabled={slot.type === 'offline'}
                 />
               </div>
               <div className="col-2">
