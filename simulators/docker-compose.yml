@@ -39,6 +39,29 @@ services:
       shure_sim:
         ipv4_address: 172.28.1.12
 
+  # PSM1000 IEM Transmitters (P10T)
+  p10t-sim-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.p10t
+    environment:
+      - DEVICE_ID=P10T-001
+      - CHANNELS=2
+    networks:
+      shure_sim:
+        ipv4_address: 172.28.1.20
+
+  p10t-sim-2:
+    build:
+      context: .
+      dockerfile: Dockerfile.p10t
+    environment:
+      - DEVICE_ID=P10T-002
+      - CHANNELS=2
+    networks:
+      shure_sim:
+        ipv4_address: 172.28.1.21
+
 networks:
   shure_sim:
     driver: bridge

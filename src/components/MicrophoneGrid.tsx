@@ -6,6 +6,7 @@
 import React from 'react';
 import { useMicboardStore } from '../store/micboard-store';
 import { MicrophoneSlot } from './MicrophoneSlot';
+import { IEMSlot } from './IEMSlot';
 import type { Transmitter } from '../types/micboard';
 
 /**
@@ -48,10 +49,23 @@ const MicrophoneGrid: React.FC = () => {
           );
         }
 
+        const transmitter = transmitters[slotNumber];
+
+        // Use IEMSlot for P10T (IEM transmitters), MicrophoneSlot for receivers
+        if (transmitter.type === 'p10t') {
+          return (
+            <IEMSlot
+              key={slotNumber}
+              transmitter={transmitter}
+              showChart={true}
+            />
+          );
+        }
+
         return (
           <MicrophoneSlot
             key={slotNumber}
-            transmitter={transmitters[slotNumber]}
+            transmitter={transmitter}
             showChart={true}
           />
         );

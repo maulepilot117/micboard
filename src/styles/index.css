@@ -483,3 +483,101 @@ code {
 .sidebar-nav .button-group .btn {
   width: 100%;
 }
+
+/* ============================================
+   IEM Slot Styles - P10T/PSM1000 specific
+   ============================================ */
+
+/* IEM slot visual distinction */
+.iem-slot {
+  /* Subtle cyan tint to distinguish from mic slots */
+}
+
+/* IEM badge in header */
+.iem-badge {
+  display: inline-block;
+  background-color: #00A8CC;
+  color: #000;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-right: 8px;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
+}
+
+/* IEM name header - cyan accent */
+.iem-name.UNASSIGNED {
+  background-color: #1a3a4a !important;
+}
+
+.iem-name.GOOD,
+.iem-name.PREV_GOOD {
+  background-color: #0a4a5a !important;
+}
+
+/* IEM electrode bar - cyan instead of status colors */
+.iem-electrode {
+  background-color: #00A8CC !important;
+  opacity: 0.3;
+}
+
+/* Stereo Level Meter - replaces battery for IEMs */
+.stereo-meter {
+  position: absolute !important;
+  left: 0;
+  width: 100%;
+  padding: 4px 8px;
+  background-color: var(--color-black, #262626);
+  box-sizing: border-box;
+}
+
+.deskmode .stereo-meter {
+  bottom: 115px;
+  height: auto;
+}
+
+.stereo-meter-row {
+  display: flex;
+  align-items: center;
+  height: 12px;
+  margin-bottom: 2px;
+}
+
+.stereo-meter-row:last-child {
+  margin-bottom: 0;
+}
+
+.stereo-meter-label {
+  width: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-white, #D7D7D7);
+  text-align: center;
+}
+
+.stereo-meter-track {
+  flex: 1;
+  height: 8px;
+  background-color: #1a1a1a;
+  border: 1px solid var(--color-gray, #616161);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stereo-meter-fill {
+  height: 100%;
+  transition: width 0.1s ease-out;
+  border-radius: 1px;
+}
+
+/* IEM-specific chart positioning - more room without battery */
+.iem-slot .chartzone {
+  padding-top: 0;
+}
+
+.iem-slot .slotgraph {
+  top: 32px;
+}

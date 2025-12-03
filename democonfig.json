@@ -10,9 +10,15 @@
     {"slot": 7, "type": "qlxd", "ip": "172.28.1.11", "channel": 3},
     {"slot": 8, "type": "qlxd", "ip": "172.28.1.11", "channel": 4},
     {"slot": 9, "type": "qlxd", "ip": "172.28.1.12", "channel": 1},
-    {"slot": 10, "type": "qlxd", "ip": "172.28.1.12", "channel": 2}
+    {"slot": 10, "type": "qlxd", "ip": "172.28.1.12", "channel": 2},
+    {"slot": 11, "type": "p10t", "ip": "172.28.1.20", "channel": 1},
+    {"slot": 12, "type": "p10t", "ip": "172.28.1.20", "channel": 2},
+    {"slot": 13, "type": "p10t", "ip": "172.28.1.21", "channel": 1},
+    {"slot": 14, "type": "p10t", "ip": "172.28.1.21", "channel": 2}
   ],
   "groups": [
-    {"group": 1, "title": "All Mics", "slots": [1,2,3,4,5,6,7,8,9,10]}
+    {"group": 1, "title": "All Devices", "slots": [1,2,3,4,5,6,7,8,9,10,11,12,13,14]},
+    {"group": 2, "title": "Mics Only", "slots": [1,2,3,4,5,6,7,8,9,10]},
+    {"group": 3, "title": "IEMs Only", "slots": [11,12,13,14]}
   ]
 }

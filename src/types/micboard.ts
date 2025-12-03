@@ -24,7 +24,7 @@ export interface Transmitter {
   status: DeviceStatus;
   battery: number; // 0-5, 255
   runtime: string;
-  antenna: string;
+  antenna?: string; // Not present for IEM (p10t) devices
   tx_offset: number; // 0-27, 255
   quality: number; // 0-5, 255
   frequency: string;

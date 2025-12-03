@@ -9,7 +9,7 @@ import React from 'react';
 type DiversityBarState = 'diversity-bar-blue' | 'diversity-bar-red' | 'diversity-bar-off';
 
 interface DiversityIndicatorProps {
-  antenna: string; // String like "AB", "RX", "XX", etc.
+  antenna?: string; // String like "AB", "RX", "XX", etc. Undefined for IEM devices.
   className?: string;
 }
 
@@ -37,6 +37,11 @@ export const DiversityIndicator: React.FC<DiversityIndicatorProps> = ({
   antenna,
   className = '',
 }) => {
+  // P10T/IEM devices don't have antenna diversity
+  if (!antenna) {
+    return null;
+  }
+
   const bars = antenna.split('').map((char) => getDiversityBarState(char));
 
   return (
